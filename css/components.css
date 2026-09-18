@@ -156,6 +156,10 @@
   font-weight: 700;
 }
 
+.timer-controls .button {
+  white-space: nowrap;
+}
+
 /* ========================================
    Timer
 ======================================== */
@@ -163,6 +167,39 @@
 .timer-panel {
   display: flex;
   flex-direction: column;
+  min-height: 520px;
+}
+
+.timer-status {
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.timer-panel:has(.timer-status) {
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.timer-status[data-status="running"] {
+  background: var(--color-green);
+  color: var(--color-brown);
+}
+
+.timer-status[data-status="paused"] {
+  background: var(--color-yellow);
+  color: var(--color-brown);
+}
+
+.timer-status[data-status="completed"] {
+  background: var(--color-orange);
+  color: var(--color-brown);
+}
+
+.timer-status[data-status="idle"] {
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
 }
 
 .timer-heading {
@@ -174,14 +211,14 @@
 
   font-size: clamp(
     4rem,
-    8vw,
-    6.5rem
+    9vw,
+    7rem
   );
 
   font-weight: 700;
 
-  line-height: 0.95;
-  letter-spacing: -0.07em;
+  line-height: 0.9;
+  letter-spacing: -0.075em;
 
   font-variant-numeric: tabular-nums;
 
@@ -225,6 +262,7 @@
 }
 
 .timer-controls {
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -107,6 +107,7 @@
           </h1>
 
           <p class="welcome-description">
+            A quiet space for focused work.
             Pick a task, start a session, and give your attention
             to one thing at a time.
           </p>
@@ -144,11 +145,17 @@
             <div
               class="timer-display"
               id="timer-display"
-              aria-live="polite"
-              aria-atomic="true"
+              aria-hidden="true"
             >
               25:00
             </div>
+
+            <div
+              class="sr-only"
+              id="timer-announcement"
+              aria-live="polite"
+              aria-atomic="true"
+            ></div>
 
             <p class="timer-label">
               Focus session

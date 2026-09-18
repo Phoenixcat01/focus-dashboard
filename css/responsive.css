@@ -75,8 +75,12 @@
 
   .timer-controls {
     display: grid;
-
+    width: 100%;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .timer-controls .button {
+    min-width: 0;
   }
 
   .button-large {
