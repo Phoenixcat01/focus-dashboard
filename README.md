@@ -1,2 +1,9 @@
-# focus-dashboard
-Focus — A quiet space for focused work. A minimal productivity dashboard combining a focus timer, task list, and progress feedback into one distraction-free workspace.
+# Focus — A quiet space for focused work.
+
+> 🚧 **Work in Progress (WIP)**  
+> Project ini sedang dalam tahap pengembangan aktif untuk menyegarkan kembali pemahaman HTML, CSS, dan JavaScript.
+
+## Tech Stack
+- HTML5
+- CSS3
+- JavaScript (Vanilla)
