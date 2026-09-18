@@ -1,0 +1,141 @@
+/* ========================================
+   Tablet
+======================================== */
+
+@media (max-width: 850px) {
+  main {
+    padding-block: 40px 56px;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-panel {
+    min-height: 480px;
+  }
+}
+
+/* ========================================
+   Mobile
+======================================== */
+
+@media (max-width: 600px) {
+  .container {
+    width: min(
+      calc(100% - 28px),
+      var(--container-width)
+    );
+  }
+
+  .site-header {
+    padding-block: 18px;
+  }
+
+  main {
+    padding-block: 32px 48px;
+  }
+
+  .welcome-section {
+    margin-bottom: 32px;
+  }
+
+  .welcome-section h1 {
+    font-size: clamp(
+      2.25rem,
+      11vw,
+      3.25rem
+    );
+  }
+
+  .welcome-description {
+    font-size: 16px;
+  }
+
+  .timer-panel,
+  .tasks-panel {
+    padding: 22px;
+  }
+
+  .timer-panel {
+    min-height: 0;
+  }
+
+  .timer-heading {
+    margin-bottom: 36px;
+  }
+
+  .timer-display {
+    font-size: clamp(
+      4rem,
+      20vw,
+      5.5rem
+    );
+  }
+
+  .timer-controls {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .button-large {
+    grid-column: 1 / -1;
+  }
+
+  .task-input-row {
+    flex-direction: column;
+  }
+
+  .task-input-row .button {
+    width: 100%;
+  }
+
+  .task-actions {
+    gap: 0;
+  }
+
+  .progress-section {
+    padding: 20px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 4px;
+  }
+}
+
+/* ========================================
+   Small mobile
+======================================== */
+
+@media (max-width: 380px) {
+  .timer-panel,
+  .tasks-panel {
+    padding: 18px;
+  }
+
+  .timer-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .button-large {
+    grid-column: auto;
+  }
+
+  .timer-controls .button {
+    width: 100%;
+  }
+
+  .task-item {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .task-actions {
+    grid-column: 2;
+  }
+}
