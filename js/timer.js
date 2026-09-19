@@ -1,27 +1,29 @@
-const TIMER_DURATION = 25 * 60;
-
-const timerState = {
-  status: "idle",
-  duration: TIMER_DURATION,
-  remaining: TIMER_DURATION,
-  endTime: null,
-  intervalId: null
-};
+import {
+  getState,
+  updateState,
+  subscribe
+} from "./storage.js";
 
 const elements = {
   display: document.querySelector("#timer-display"),
   status: document.querySelector("#timer-status"),
   progressBar: document.querySelector("#timer-progress-bar"),
+  progressTrack: document.querySelector(".progress-track"),
   announcement: document.querySelector("#timer-announcement"),
-
+  sessionCount: document.querySelector("#session-count"),
   startButton: document.querySelector("#start-timer"),
   pauseButton: document.querySelector("#pause-timer"),
   resetButton: document.querySelector("#reset-timer")
 };
 
+let intervalId = null;
+
+function getTimer() {
+  return getState().timer;
+}
+
 function formatTime(seconds) {
   const safeSeconds = Math.max(0, Math.ceil(seconds));
-
   const minutes = Math.floor(safeSeconds / 60);
   const remainingSeconds = safeSeconds % 60;
 
@@ -42,166 +44,185 @@ function announce(message) {
   }, 10);
 }
 
-function updateDisplay() {
-  elements.display.textContent = formatTime(
-    timerState.remaining
-  );
-}
+function renderTimer(state) {
+  const timer = state.timer;
 
-function updateProgress() {
-  const progress =
-    timerState.remaining / timerState.duration;
+  elements.display.textContent = formatTime(timer.remaining);
 
-  elements.progressBar.style.transform =
-    `scaleX(${Math.max(0, Math.min(1, progress))})`;
-}
+  const progress = timer.duration
+    ? timer.remaining / timer.duration
+    : 0;
 
-function updateStatus() {
-  const statusLabels = {
+  const safeProgress = Math.max(0, Math.min(1, progress));
+  const progressPercent = Math.round((1 - safeProgress) * 100);
+
+  elements.progressBar.style.transform = `scaleX(${safeProgress})`;
+  elements.progressTrack.setAttribute("aria-valuenow", String(progressPercent));
+
+  const labels = {
     idle: "Ready",
     running: "Focusing",
     paused: "Paused",
     completed: "Complete"
   };
 
-  const status = timerState.status;
+  elements.status.textContent = labels[timer.status];
+  elements.status.dataset.status = timer.status;
 
-  elements.status.textContent =
-    statusLabels[status];
+  elements.startButton.disabled = timer.status === "running";
+  elements.pauseButton.disabled = timer.status !== "running";
 
-  elements.status.dataset.status = status;
-}
-
-function updateButtons() {
-  const {
-    status
-  } = timerState;
-
-  elements.startButton.disabled =
-    status === "running";
-
-  elements.pauseButton.disabled =
-    status !== "running";
-
-  if (status === "paused") {
-    elements.startButton.textContent = "Resume";
-  } else if (status === "completed") {
-    elements.startButton.textContent =
+  if (timer.status === "paused") {
+    elements.startButton.querySelector("span").textContent = "Resume";
+  } else if (timer.status === "completed") {
+    elements.startButton.querySelector("span").textContent =
       "Start another session";
   } else {
-    elements.startButton.textContent = "Start";
+    elements.startButton.querySelector("span").textContent = "Start";
   }
 }
 
-function renderTimer() {
-  updateDisplay();
-  updateProgress();
-  updateStatus();
-  updateButtons();
-}
-
-function clearTimerInterval() {
-  if (timerState.intervalId !== null) {
-    window.clearInterval(timerState.intervalId);
-
-    timerState.intervalId = null;
+function renderSessionCount(state) {
+  if (elements.sessionCount) {
+    elements.sessionCount.textContent = state.sessionsCompleted;
   }
 }
 
-function tick() {
-  if (timerState.status !== "running") {
+function render(state) {
+  renderTimer(state);
+  renderSessionCount(state);
+}
+
+function stopTicking() {
+  if (intervalId !== null) {
+    window.clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+
+function updateTimerFromClock() {
+  const timer = getTimer();
+
+  if (timer.status !== "running" || !timer.endTime) {
     return;
   }
 
-  const now = Date.now();
+  const remaining = Math.max(0, (timer.endTime - Date.now()) / 1000);
 
-  const remainingMilliseconds =
-    timerState.endTime - now;
-
-  timerState.remaining =
-    Math.max(0, remainingMilliseconds / 1000);
-
-  if (timerState.remaining <= 0) {
+  if (remaining <= 0) {
     completeTimer();
     return;
   }
 
-  renderTimer();
+  updateState((state) => ({
+    ...state,
+    timer: {
+      ...state.timer,
+      remaining
+    }
+  }));
+}
+
+function startTicking() {
+  stopTicking();
+  intervalId = window.setInterval(updateTimerFromClock, 250);
 }
 
 function startTimer() {
-  if (timerState.status === "running") {
+  const timer = getTimer();
+
+  if (timer.status === "running") {
     return;
   }
 
-  const now = Date.now();
+  const endTime = Date.now() + timer.remaining * 1000;
 
-  timerState.endTime =
-    now + timerState.remaining * 1000;
+  updateState((state) => ({
+    ...state,
+    timer: {
+      ...state.timer,
+      status: "running",
+      endTime
+    }
+  }));
 
-  timerState.status = "running";
-
-  clearTimerInterval();
-
-  timerState.intervalId =
-    window.setInterval(tick, 250);
-
-  renderTimer();
-
+  startTicking();
   announce("Focus session started.");
 }
 
 function pauseTimer() {
-  if (timerState.status !== "running") {
+  if (getTimer().status !== "running") {
     return;
   }
 
-  tick();
+  updateTimerFromClock();
 
-  timerState.status = "paused";
+  const latestTimer = getTimer();
 
-  timerState.endTime = null;
+  if (latestTimer.status !== "running") {
+    return;
+  }
 
-  clearTimerInterval();
+  updateState((state) => ({
+    ...state,
+    timer: {
+      ...state.timer,
+      status: "paused",
+      endTime: null
+    }
+  }));
 
-  renderTimer();
-
+  stopTicking();
   announce("Focus session paused.");
 }
 
 function resetTimer() {
-  clearTimerInterval();
+  stopTicking();
 
-  timerState.status = "idle";
-
-  timerState.remaining =
-    timerState.duration;
-
-  timerState.endTime = null;
-
-  renderTimer();
+  updateState((state) => ({
+    ...state,
+    timer: {
+      duration: state.timer.duration,
+      remaining: state.timer.duration,
+      status: "idle",
+      endTime: null
+    }
+  }));
 
   announce("Focus session reset.");
 }
 
 function completeTimer() {
-  clearTimerInterval();
+  stopTicking();
 
-  timerState.remaining = 0;
+  if (getTimer().status === "completed") {
+    return;
+  }
 
-  timerState.endTime = null;
-
-  timerState.status = "completed";
-
-  renderTimer();
+  updateState((state) => ({
+    ...state,
+    timer: {
+      ...state.timer,
+      remaining: 0,
+      status: "completed",
+      endTime: null
+    },
+    sessionsCompleted: state.sessionsCompleted + 1
+  }));
 
   announce("Focus session complete.");
 }
 
 function handleStart() {
-  if (timerState.status === "completed") {
-    timerState.remaining =
-      timerState.duration;
+  if (getTimer().status === "completed") {
+    updateState((state) => ({
+      ...state,
+      timer: {
+        ...state.timer,
+        remaining: state.timer.duration,
+        status: "idle"
+      }
+    }));
   }
 
   startTimer();
@@ -209,27 +230,24 @@ function handleStart() {
 
 function handleKeyboard(event) {
   const target = event.target;
-
   const isTyping =
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement ||
     target.isContentEditable;
 
-  if (isTyping) {
+  if (isTyping || event.ctrlKey || event.metaKey || event.altKey) {
     return;
   }
 
   if (event.code === "Space") {
     event.preventDefault();
 
-    if (timerState.status === "running") {
+    if (getTimer().status === "running") {
       pauseTimer();
     } else {
       handleStart();
     }
-
-    return;
   }
 
   if (event.key.toLowerCase() === "r") {
@@ -240,9 +258,9 @@ function handleKeyboard(event) {
 function handleVisibilityChange() {
   if (
     document.visibilityState === "visible" &&
-    timerState.status === "running"
+    getTimer().status === "running"
   ) {
-    tick();
+    updateTimerFromClock();
   }
 }
 
@@ -256,32 +274,25 @@ function initializeTimer() {
     return;
   }
 
-  elements.startButton.addEventListener(
-    "click",
-    handleStart
-  );
+  elements.startButton.addEventListener("click", handleStart);
+  elements.pauseButton.addEventListener("click", pauseTimer);
+  elements.resetButton.addEventListener("click", resetTimer);
 
-  elements.pauseButton.addEventListener(
-    "click",
-    pauseTimer
-  );
+  window.addEventListener("keydown", handleKeyboard);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  elements.resetButton.addEventListener(
-    "click",
-    resetTimer
-  );
+  subscribe(render);
+  render(getState());
 
-  window.addEventListener(
-    "keydown",
-    handleKeyboard
-  );
+  const timer = getTimer();
 
-  document.addEventListener(
-    "visibilitychange",
-    handleVisibilityChange
-  );
-
-  renderTimer();
+  if (timer.status === "running") {
+    if (timer.endTime && Date.now() >= timer.endTime) {
+      completeTimer();
+    } else {
+      startTicking();
+    }
+  }
 }
 
 export {
