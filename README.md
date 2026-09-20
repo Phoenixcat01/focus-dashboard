@@ -1,6 +1,4 @@
-# ⏳ Focus
-
-Minimal productivity dashboard for focused work and study sessions.
+# Focus — A quiet space for focused work.
 
 ---
 
