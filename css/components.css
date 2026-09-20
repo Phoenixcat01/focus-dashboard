@@ -245,10 +245,57 @@
 }
 
 .task-checkbox {
-  width: 1.2rem;
-  height: 1.2rem;
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 1.25rem;
+  height: 1.25rem;
+
   flex: 0 0 auto;
-  accent-color: var(--color-green);
+
+  margin: 0;
+
+  border: 1.5px solid var(--color-border);
+  border-radius: 50%;
+
+  background: var(--color-surface);
+
+  cursor: pointer;
+
+  display: grid;
+  place-items: center;
+
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.task-checkbox:hover {
+  border-color: var(--color-green);
+  transform: scale(1.05);
+}
+
+.task-checkbox:checked {
+  border-color: var(--color-green);
+  background: var(--color-green);
+}
+
+.task-checkbox:checked::after {
+  content: "";
+
+  width: 0.35rem;
+  height: 0.65rem;
+
+  border-right: 2px solid var(--color-brown);
+  border-bottom: 2px solid var(--color-brown);
+
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.task-checkbox:focus-visible {
+  outline: 3px solid var(--color-orange);
+  outline-offset: 3px;
 }
 
 .task-item.is-completed .task-title {

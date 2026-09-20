@@ -143,7 +143,6 @@ function createTaskElement(task) {
           <path d="M12 20h9"></path>
           <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
         </svg>
-        <span>Edit</span>
       </button>
 
       <button
@@ -157,7 +156,6 @@ function createTaskElement(task) {
           <path d="m19 6-1 15H6L5 6"></path>
           <path d="M10 11v6M14 11v6"></path>
         </svg>
-        <span>Delete</span>
       </button>
     </div>
   `;
@@ -196,7 +194,6 @@ function enterEditMode(taskItem) {
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="m5 12 4 4L19 6"></path>
           </svg>
-          <span>Save</span>
         </button>
 
         <button
@@ -206,7 +203,6 @@ function enterEditMode(taskItem) {
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M6 6l12 12M18 6 6 18"></path>
           </svg>
-          <span>Cancel</span>
         </button>
       </div>
     </form>
@@ -321,6 +317,7 @@ function initializeTasks() {
     previousTasks = state.tasks;
     renderTasks(state);
   });
+
   renderTasks(getState());
 }
 
