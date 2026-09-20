@@ -266,15 +266,19 @@ function handleListClick(event) {
 }
 
 function handleListChange(event) {
-  if (!event.target.classList.contains("task-checkbox")) {
+  const checkbox = event.target.closest(".task-checkbox");
+
+  if (!checkbox) {
     return;
   }
 
-  const taskItem = event.target.closest(".task-item");
+  const taskItem = checkbox.closest(".task-item");
 
-  if (taskItem) {
-    toggleTask(taskItem.dataset.taskId);
+  if (!taskItem) {
+    return;
   }
+
+  toggleTask(taskItem.dataset.taskId);
 }
 
 function handleEditSubmit(event) {
@@ -307,7 +311,16 @@ function initializeTasks() {
   elements.list.addEventListener("change", handleListChange);
   elements.list.addEventListener("submit", handleEditSubmit);
 
-  subscribe(renderTasks);
+  let previousTasks = getState().tasks;
+
+  subscribe((state) => {
+    if (state.tasks === previousTasks) {
+      return;
+    }
+
+    previousTasks = state.tasks;
+    renderTasks(state);
+  });
   renderTasks(getState());
 }
 
