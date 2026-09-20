@@ -5,11 +5,13 @@
   --color-orange: #fda769;
   --color-brown: #473c33;
 
+  /* Checkbox */
+  --color-checkmark: #473c33;
+
   /* Light theme */
   --color-background: #fffaf2;
   --color-surface: #ffffff;
   --color-surface-soft: #fff3df;
-
   --color-text: #473c33;
   --color-text-muted: #817a70;
   --color-border: #eadfce;
@@ -43,19 +45,21 @@
 }
 
 :root[data-theme="dark"] {
-  --color-background: #2d2925;
-  --color-surface: #3a342e;
-  --color-surface-soft: #453d35;
+  --color-background: #1f211f;
+  --color-surface: #282b27;
+  --color-surface-soft: #30342e;
 
-  --color-text: #f5eadb;
-  --color-text-muted: #c9bba9;
-  --color-border: #65594d;
+  --color-text: #f3f0e8;
+  --color-text-muted: #b8b8ae;
+  --color-border: #454940;
 
-  --color-green: #abc270;
-  --color-yellow: #fec868;
-  --color-orange: #fda769;
-  --color-brown: #473c33;
+  --color-green: #b7cc7b;
+  --color-yellow: #f3c968;
+  --color-orange: #e9a066;
 
-  --shadow-sm: 0 8px 24px rgb(0 0 0 / 14%);
-  --shadow-md: 0 18px 50px rgb(0 0 0 / 20%);
+  --color-brown: #292d27;
+  --color-checkmark: #292d27;
+
+  --shadow-sm: 0 8px 24px rgb(0 0 0 / 20%);
+  --shadow-md: 0 18px 50px rgb(0 0 0 / 28%);
 }
